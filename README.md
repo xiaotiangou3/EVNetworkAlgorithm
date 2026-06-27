@@ -117,12 +117,7 @@ Else:
 **Console Output:**
 ```
 > java EVNetworkDemo
-Test Case 1: Standard Achievable Highway
-Basic DP (O(N^2)):
-Minimum Cost: RM 100
-Selected Stops: [200, 600]
-Optimized DP (O(N)):
-Minimum Cost: RM 100
+Minimum Cost: 100
 Selected Stops: [200, 600]
 ```
 
@@ -136,11 +131,8 @@ Selected Stops: [200, 600]
 **Console Output:**
 ```
 > java EVNetworkDemo
-Test Case 2: Impossible Scenario (Gap > R_max)
-Basic DP (O(N^2)):
-Result: Impossible to complete the journey.
-Optimized DP (O(N)):
-Result: Impossible to complete the journey.
+Minimum Cost: -1
+Selected Stops (distances): []
 ```
 
 ---
