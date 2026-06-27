@@ -100,6 +100,9 @@ Else:
     return dp[N-1]
 ```
 
+### Algorithm Flowchart
+![Algorithm Flowchart](docs/assets/flowchart.png)
+
 ---
 
 ## 3. Demonstration & Output
