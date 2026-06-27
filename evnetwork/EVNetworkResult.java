@@ -13,6 +13,6 @@ public class EVNetworkResult {
 
     @Override
     public String toString() {
-        return "Minimum Cost: RM " + minCost + "\nSelected Stops (distances): " + selectedStops;
+        return "Minimum Cost: " + minCost + "\nSelected Stops (distances): " + selectedStops;
     }
 }
