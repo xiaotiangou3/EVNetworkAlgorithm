@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Charging Network Optimization</title>
+    <meta name="description" content="An algorithmic solution to minimizing EV charging network installation costs using Dynamic Programming.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <nav>
+        <div class="nav-content">
+            <div class="logo">Algorithm Portfolio</div>
+            <div class="links">
+                <a href="#problem">The Problem</a>
+                <a href="#algorithm">The Algorithm</a>
+                <a href="#demonstration">Demonstration</a>
+                <a href="#analysis">Analysis</a>
+                <a href="https://github.com/xiaotiangou3/EVNetworkAlgorithm" target="_blank" class="github-btn">View on GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero glass-panel fade-in">
+            <h1>Optimizing <span class="gradient-text">EV Charging Networks</span></h1>
+            <p class="subtitle">A $\Theta(N)$ Dynamic Programming solution to solve the highway range anxiety problem while minimizing installation costs.</p>
+            <a href="#problem" class="cta-button">Explore the Project</a>
+        </section>
+
+        <section id="problem" class="content-section fade-in">
+            <h2 class="section-title">1. The Problem</h2>
+            <div class="card-grid">
+                <div class="glass-card">
+                    <h3>The Scenario</h3>
+                    <p>The highway department is planning a massive green infrastructure project. They need to install high-speed EV charging hubs at existing rest stops along a linear highway.</p>
+                </div>
+                <div class="glass-card">
+                    <h3>The Challenge</h3>
+                    <p>Range anxiety is a major barrier to EV adoption. If the gap between stations exceeds standard EV range ($R_{max}$), drivers will be stranded. However, installing charging hubs is extremely expensive. Using a naive approach wastes millions in budget.</p>
+                </div>
+                <div class="glass-card">
+                    <h3>The Objective</h3>
+                    <p>Find the absolute <strong>minimum total cost</strong> required to build a valid charging network, ensuring no driver ever runs out of battery. If the distance between two necessary rest stops exceeds the EV range, it's impossible, and the program must gracefully return an error.</p>
+                </div>
+            </div>
+            <div class="glass-card" style="margin-top: 2rem;">
+                <h3>The Problem</h3>
+                <p style="margin-bottom: 1rem;">The highway department needs to select a subset of existing rest stops along a linear highway of length <code>L</code> to install high-speed EV charging hubs. The goal is to minimize the total installation cost while ensuring that no two adjacent charging stations are further apart than the maximum driving range of a standard EV.</p>
+                <p style="margin-bottom: 0.5rem;">You are given a 1-dimensional, linear highway of total length <code>L</code> kilometers. Along this highway, there are <code>n</code> existing rest stops. You are given three inputs:</p>
+                <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+                    <li><code>distances</code>: An integer array of length <code>n</code>, where <code>distances[i]</code> represents the exact kilometer marker of the <code>i</code>-th rest stop from the starting point of the highway. (The array is guaranteed to be strictly increasing: <code>distances[0] < distances[1] < ... < distances[n-1]</code>).</li>
+                    <li><code>costs</code>: An integer array of length <code>n</code>, where <code>costs[i]</code> represents the financial cost (in RM) to construct a high-speed charging hub at the <code>i</code>-th rest stop.</li>
+                    <li><code>R_max</code>: An integer representing the maximum driving range (in kilometers) of a standard electric vehicle on a full charge.</li>
+                </ul>
+                <p style="margin-bottom: 1rem;">A vehicle starts at kilometer 0 with a full battery. To ensure a vehicle never runs out of power, the distance from the starting point to the first chosen hub, the distance between any two consecutively chosen hubs, and the distance from the last chosen hub to the end of the highway (<code>L</code> km) must not exceed <code>R_max</code>. You can choose any subset of the <code>n</code> rest stops to build a hub, provided the range feasibility rule is maintained globally across the corridor.</p>
+                <p>Return the minimum total cost required to build a valid charging network along the highway. If it is physically impossible to bridge the highway under the given <code>R_max</code> constraint, return <code>-1</code>.</p>
+            </div>
+        </section>
+
+        <section id="algorithm" class="content-section fade-in">
+            <h2 class="section-title">2. The Algorithm</h2>
+            <div class="glass-card">
+                <p>To solve problem, a key observation is the minimum cost to reach the i-th stop is logically the minimum of the minimum total cost to reach the j-th stop (j < i) plus <code>costs[i]</code>. A greedy approach would fail here because choosing the cheapest available stop now might force us into an exorbitantly expensive stop later. Instead, we use <strong>Dynamic Programming (DP)</strong>.</p>
+
+                <h3>Recurrence Relation</h3>
+                <p class="formula" style="text-align:center">$dp[i] = costs[i] + \displaystyle{\min_{\substack{0\le j< i \\ distances[i]-distances[j]\le R_{max}}}(dp[j])}$</p>
+                
+                <h3>Optimization</h3>
+                <p style="margin-bottom: 1rem;">The basic DP approach involves iterating backwards from the current stop <code>i</code> to find the minimum <code>dp[j]</code> among all valid previous stops <code>j</code> within the range <code>R_max</code>. This nested loop results in a time complexity of $O(N^2)$.</p>
+                <p style="margin-bottom: 1rem;">To optimize this to $O(N)$, we utilize a <strong>Monotonic Deque</strong> (sliding window minimum). The deque maintains a strictly increasing order of <code>dp</code> costs for all reachable nodes. Instead of scanning all previous nodes, the optimal cost <code>dp[j]</code> is always immediately available at the front of the deque (<code>deque.peekFirst()</code>). Nodes that fall out of the <code>R_max</code> range are popped from the front, and nodes with higher costs are popped from the back when a cheaper node is inserted, ensuring amortized $O(1)$ state transitions.</p>
+                
+                <h3>Optimized Pseudocode</h3>
+                <pre><code>Algorithm: MinimumCostEVNetwork(L, distances, costs, R_max)
+Input: 
+    L: Integer, total length of the highway
+    distances: Array of rest stop distance markers (length n)
+    costs: Array of costs to build a hub at each rest stop (length n)
+    R_max: Integer, maximum EV driving range
+Output: 
+    Minimum total cost to reach the end of the highway, or -1 if impossible
+
+// Pre-processing to add Start (0) and End (L) nodes
+N &larr; length(distances) + 2
+dist &larr; new Array(N)
+cst &larr; new Array(N)
+
+dist[0] &larr; 0
+cst[0] &larr; 0
+For i = 0 to length(distances) - 1:
+    dist[i+1] &larr; distances[i]
+    cst[i+1] &larr; costs[i]
+dist[N-1] &larr; L
+cst[N-1] &larr; 0
+
+// DP Initialization
+dp &larr; new Array(N) initialized to Infinity
+dp[0] &larr; 0
+
+// Initialize double-ended queue to store indices of potential previous stops
+deque &larr; new DoubleEndedQueue()
+deque.addLast(0)
+
+For i = 1 to N - 1:
+    
+    // Step 1: Remove indices from the front that are out of EV range
+    While deque is not empty AND (dist[i] - dist[deque.peekFirst()]) > R_max:
+        deque.pollFirst()
+        
+    // Step 2: Check if current node is reachable
+    If deque is empty:
+        continue // Unreachable from any previous valid node
+        
+    // Step 3: Calculate optimal cost (front of deque always has minimum valid cost)
+    bestParent &larr; deque.peekFirst()
+    dp[i] &larr; dp[bestParent] + cst[i]
+    
+    // Step 4: Maintain monotonic property of the deque
+    // Remove indices from the back if they have a higher or equal cost than the current node
+    While deque is not empty AND dp[deque.peekLast()] >= dp[i]:
+        deque.pollLast()
+        
+    // Add current node index to the back of the deque
+    deque.addLast(i)
+
+// Return output
+If dp[N-1] >= Infinity:
+    return -1
+Else:
+    return dp[N-1]</code></pre>
+            </div>
+        </section>
+
+        <section id="demonstration" class="content-section fade-in">
+            <h2 class="section-title">3. Demonstration & Output</h2>
+            <div class="card-grid">
+                <div class="glass-card console-card">
+                    <h3>Test Case 1: An optimal solution is achievable.</h3>
+                    <strong>Input</strong>
+                    <p>$L = 1000$</p>
+                    <p>$distances = [200, 400, 600, 800]$</p>
+                    <p>$costs = [50, 100, 50, 100]$</p>
+                    <p>$R_{max} = 400$</p>
+                    <div style="margin-bottom: 1rem"></div>
+                    <strong>Output</strong>
+                    <div class="console">
+                        <span class="prompt">> java EVNetworkDemo</span>
+Minimum Cost: 100
+Selected Stops (distances): [200, 600]
+                    </div>
+                    
+                    <div class="trace-container" id="trace-tc1">
+                        <h4>Interactive Program Trace</h4>
+                        <div class="trace-controls">
+                            <button class="trace-btn" onclick="prevStep('tc1')">&larr; Prev</button>
+                            <span class="trace-step-indicator" id="tc1-step">Step 0 of 0</span>
+                            <button class="trace-btn" onclick="nextStep('tc1')">Next &rarr;</button>
+                        </div>
+                        <div class="trace-explanation" id="tc1-explanation">
+                            Initialization
+                        </div>
+                        <div class="trace-state">
+                            <div class="trace-row">
+                                <span class="trace-label">i = <span id="tc1-i">-</span></span>
+                                <span class="trace-label">dist[i] = <span id="tc1-dist">-</span></span>
+                                <span class="trace-label">cst[i] = <span id="tc1-cst">-</span></span>
+                            </div>
+                            <div class="trace-row">
+                                <span class="trace-label">dp array:</span>
+                                <div class="array-container" id="tc1-dp-array"></div>
+                            </div>
+                            <div class="trace-row">
+                                <span class="trace-label">deque (indices):</span>
+                                <div class="array-container" id="tc1-deque-array"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card console-card">
+                    <h3>Test Case 2: A solution is impossible.</h3>
+                    <strong>Input</strong>
+                    <p>$L = 1000$</p>
+                    <p>$distances = [200, 300, 800, 900]$</p>
+                    <p>$costs = [50, 50, 50, 50]$</p>
+                    <p>$R_{max} = 400$</p>
+                    <div style="margin-bottom: 1rem"></div>
+                    <strong>Output</strong><div class="console error-console">
+                        <span class="prompt">> java EVNetworkDemo</span>
+Minimum Cost: -1
+Selected Stops (distances): []
+                    </div>
+                    
+                    <div class="trace-container" id="trace-tc2">
+                        <h4>Interactive Program Trace</h4>
+                        <div class="trace-controls">
+                            <button class="trace-btn" onclick="prevStep('tc2')">&larr; Prev</button>
+                            <span class="trace-step-indicator" id="tc2-step">Step 0 of 0</span>
+                            <button class="trace-btn" onclick="nextStep('tc2')">Next &rarr;</button>
+                        </div>
+                        <div class="trace-explanation" id="tc2-explanation">
+                            Initialization
+                        </div>
+                        <div class="trace-state">
+                            <div class="trace-row">
+                                <span class="trace-label">i = <span id="tc2-i">-</span></span>
+                                <span class="trace-label">dist[i] = <span id="tc2-dist">-</span></span>
+                                <span class="trace-label">cst[i] = <span id="tc2-cst">-</span></span>
+                            </div>
+                            <div class="trace-row">
+                                <span class="trace-label">dp array:</span>
+                                <div class="array-container" id="tc2-dp-array"></div>
+                            </div>
+                            <div class="trace-row">
+                                <span class="trace-label">deque (indices):</span>
+                                <div class="array-container" id="tc2-deque-array"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="analysis" class="content-section fade-in">
+            <h2 class="section-title">4. Algorithm Analysis</h2>
+            <div class="glass-card">
+                <div class="analysis-grid">
+                    <div>
+                        <h3 class="gradient-text">Time Complexity: $\Theta(N)$</h3>
+                        <p>By substituting a linear search for previous nodes with a Monotonic Deque, the optimization reduces the state transition time from $O(N)$ per iteration to an <strong>amortized $O(1)$</strong>.</p>
+                        <p>Because there are exactly $N$ insertions across the entire algorithm, there can be at most $N$ deletions. The total time spent across all inner while loops is strictly bounded by $O(N)$, resulting in an optimal $\Theta(N)$ universally across best, average, and worst-case scenarios.</p>
+                    </div>
+                    <div>
+                        <h3 class="gradient-text">Space Complexity: $\Theta(N)$</h3>
+                        <p>The solution requires $O(N)$ space to store the 1D <code>dp</code> array, distance arrays, and the path reconstruction array. The Deque data structure stores at most $N$ elements at any given time, requiring an additional $O(N)$ space.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
