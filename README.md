@@ -142,6 +142,12 @@ Selected Stops (distances): []
 ### Time Complexity: $\Theta(N)$
 By substituting a linear search for previous nodes with a Monotonic Deque, the optimization reduces the state transition time from $\mathcal{O}(N)$ per iteration to an **amortized $\mathcal{O}(1)$**. Because there are exactly $N$ insertions across the entire algorithm, there can be at most $N$ deletions. The total time spent across all inner while loops is strictly bounded by $\mathcal{O}(N)$, resulting in an optimal $\Theta(N)$ universally across best, average, and worst-case scenarios.
 
+**Empirical Proof**
+
+As seen in the graph below, the execution time scales perfectly linearly with the input size (number of rest stops), confirming our $\Theta(N)$ theoretical analysis.
+
+![Runtime Graph](docs/assets/runtime_graph.png)
+
 ### Space Complexity: $\Theta(N)$
 The solution requires $\mathcal{O}(N)$ space to store the 1D `dp` array, distance arrays, and the path reconstruction array. The Deque data structure stores at most $N$ elements at any given time, requiring an additional $\mathcal{O}(N)$ space.
 

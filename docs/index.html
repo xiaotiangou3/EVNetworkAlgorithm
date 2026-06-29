@@ -250,6 +250,12 @@ Selected Stops (distances): []
                         <h3 class="gradient-text">Time Complexity: $\Theta(N)$</h3>
                         <p>By substituting a linear search for previous nodes with a Monotonic Deque, the optimization reduces the state transition time from $O(N)$ per iteration to an <strong>amortized $O(1)$</strong>.</p>
                         <p>Because there are exactly $N$ insertions across the entire algorithm, there can be at most $N$ deletions. The total time spent across all inner while loops is strictly bounded by $O(N)$, resulting in an optimal $\Theta(N)$ universally across best, average, and worst-case scenarios.</p>
+                        
+                        <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Empirical Proof</h4>
+                        <p style="margin-bottom: 1rem;">As seen in the graph below, the execution time scales perfectly linearly with the input size (number of rest stops), confirming our $\Theta(N)$ theoretical analysis.</p>
+                        <div style="text-align: center; margin-top: 1rem; background-color:white; padding: 0.5rem; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <img src="assets/runtime_graph.png" alt="Runtime Graph" style="max-width: 100%; border-radius: 8px;">
+                        </div>
                     </div>
                     <div>
                         <h3 class="gradient-text">Space Complexity: $\Theta(N)$</h3>
